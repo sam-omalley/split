@@ -7,10 +7,14 @@ Usage information: split.py -h
 """
 
 import argparse
+import logging
 import os
 import sys
 
-verbose = False
+
+log_formatter = logging.Formatter("%(message)s")
+logger = logging.getLogger(__name__)
+
 
 def main():
 	parser = argparse.ArgumentParser(
@@ -50,14 +54,13 @@ def main():
 		'-v',
 		'--verbose',
 		dest='verbose',
-		action='store_true',
-		help='Use verbose output.',
+		action='count',
+		help='''Use verbose output.
+		Can be specified multiple times to increase verbosity (maximum of two times)''',
 		)
 
 	args = parser.parse_args()
-
-	global verbose
-	verbose = args.verbose
+	setup_logging(verbose=args.verbose)
 
 	file_num = 1
 	while split(args.input_file, args.num_lines, args.output_file, file_num):
@@ -72,8 +75,7 @@ def split(large_file, num_lines, base_name, file_num):
 	"""
 	out_filename = construct_output_filename(base_name, file_num)
 
-	if verbose:
-		print("Writing chunk: {}".format(out_filename))
+	logger.debug("Writing chunk: {}".format(out_filename))
 
 	with open(out_filename, 'w') as out_file:
 		for x in range(num_lines):
@@ -110,6 +112,23 @@ def construct_output_filename(base_name, file_num, separator='_'):
 		num=file_num,
 		ext=file_extension,
 		)
+
+def setup_logging(verbose=False):
+	console_handler = logging.StreamHandler()
+	console_handler.setFormatter(log_formatter)
+	logger.addHandler(console_handler)
+
+	if verbose >= 2:
+		logger.setLevel(logging.DEBUG)
+	elif verbose >= 1:
+		logger.setLevel(logging.INFO)
+	else:
+		logger.setLevel(logging.WARNING)
+
+	logger.debug("Using {} log-level".format(
+		logging.getLevelName(logger.level),
+		)
+	)
 
 
 if __name__ == "__main__":
