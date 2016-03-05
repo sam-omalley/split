@@ -23,7 +23,8 @@ based on their number of lines. It does not load any files into memory so can be
                             Base-name of output file chunks. A base-name of
                             chunk.txt will result in output of the format
                             chunk_1.txt, chunk_2.txt, etc. (default: chunk.txt)
-      -v, --verbose         Use verbose output.
+      -v, --verbose         Use verbose output. Can be specified multiple times to
+                            increase verbosity (maximum of two times)
 
 ## Tests
 
